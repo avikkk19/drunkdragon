@@ -100,7 +100,7 @@ const userAuthThroughServer = (serverRoute, formData) => {
    <Navigate to="/" />
  ) : (
    <AnimationWrapper keyValue={type}>
-     <section className="h-cover flex items-center justify-center">
+     <section className="h-cover flex items-center justify-center mt-20">
        <Toaster />
        <form
          id="formElement"

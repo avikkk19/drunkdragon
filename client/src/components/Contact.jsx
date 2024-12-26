@@ -22,7 +22,7 @@ const Contact = () => {
           />
         </div>
 
-        <div className="absolute -top-40 left-20 w-60 sm:top-1/2 md:left-auto md:right-10  lg:top-20 lg:w-80 sm:mr-10">
+        <div className="absolute top-10 left-8 w-72 sm:top-20  md:left-auto md:right-10  lg:top-20 lg:w-80 ">
           <ImageClipBox
             src="/img/leclercfeature.jpg"
             clipClass="absolute md:scale-125"
