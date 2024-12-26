@@ -1,35 +1,36 @@
-# Dependency directories
-node_modules/
-
 # Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
+
+# Node modules
+node_modules/
+server/node_modules/
 
 # Environment files
 .env
-.env.local
-.env.*.local
+server/.env
+server/mern-blog-60048-firebase-adminsdk-wet16-7d1c3c398d.json
 
-# Vite build output
+
+# Build directories
 dist/
-!.env.example
+dist-ssr/
 
-# Local IDE and editor settings
-.vscode/
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
 .idea/
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+*.sw?
 
-# macOS
-.DS_Store
-
-# Windows
-Thumbs.db
-ehthumbs.db
-
-# Other
-*.log
+# Local files
+*.local

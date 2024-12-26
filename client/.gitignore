@@ -7,20 +7,30 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# Node modules
+node_modules/
+server/node_modules/
 
-dist
-dist-ssr
-*.local
-.env 
-.env.development
+# Environment files
+.env
+server/.env
+server/mern-blog-60048-firebase-adminsdk-wet16-7d1c3c398d.json
+
+
+# Build directories
+dist/
+dist-ssr/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Local files
+*.local
