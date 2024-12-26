@@ -17,9 +17,12 @@ server/.env
 server/mern-blog-60048-firebase-adminsdk-wet16-cda67f7484.json
 
 
-# Build directories
-dist/
-dist-ssr/
+# Ignore node_modules
+client/node_modules/
+
+# Explicitly unignore dist folder
+!client/dist/
+
 
 # Editor directories and files
 .vscode/*
