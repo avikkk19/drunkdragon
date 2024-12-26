@@ -8,7 +8,8 @@ import cors from "cors";
 import admin from "firebase-admin";
 import serviceAccountKey from "./mern-blog-60048-firebase-adminsdk-wet16-cda67f7484.json" with { type: "json" };
 import { getAuth } from "firebase-admin/auth";
-
+import path from "path";
+import { fileURLToPath } from "url";
 // const serviceAccountKey = await import(
 //   "./mern-blog-60048-firebase-adminsdk-wet16-cda67f7484.json",
 //   {
@@ -32,6 +33,13 @@ let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
 server.use(express.json());
 server.use(cors());
+
+// Define __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+server.use(express.static(path.join(__dirname, "/client/dist")));
+
 
 // MongoDB connection
 mongoose

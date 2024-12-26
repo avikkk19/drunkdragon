@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "your-test-command",
+    "e2e": "your-e2e-test-command"
   },
   "dependencies": {
     "@flaticon/flaticon-uicons": "^3.3.1",

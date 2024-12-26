@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // Component imports
 import NavBar from "./components/Navbar";
@@ -12,7 +12,7 @@ import Footer from "./components/Footer";
 import UserAuthForm from "./pages/UserAuthForm";
 
 // Utils import
-import { lookInSession } from "./common/session";
+import { lookInSession } from "./common/Session";
 
 // Create context
 export const UserContext = createContext({});
@@ -58,6 +58,8 @@ const App = () => {
           />
           <Route path="/signin" element={<UserAuthForm type="signin" />} />
           <Route path="/signup" element={<UserAuthForm type="signup" />} />
+          {/* Add a catch-all route */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
       <NavBar />

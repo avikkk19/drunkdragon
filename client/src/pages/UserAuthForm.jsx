@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import AnimationWrapper from "../common/AnimationWrapper";
-import InputBox from "../components/inputBox";
+import InputBox from "../components/InputBox";
 import googleIcon from "../imgs/google.png";
 import { Link, useLocation, Navigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import axios from "axios";
-import { storeInSession } from "../common/session";
+import { storeInSession } from "../common/Session";
 import { UserContext } from "../App";
 import { authWithGoogle } from "../common/Firebase";
 
