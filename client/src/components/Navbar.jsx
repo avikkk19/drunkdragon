@@ -97,11 +97,7 @@ const NavBar = () => {
     if (access_token) {
       return (
         <>
-          {/* <Link to="/dashboard/notifications">
-            <div className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10 flex items-center justify-center">
-              <i className="fi fi-rr-bell text-2xl block mt-1"></i>
-            </div>
-          </Link> */}
+          
 
           <div className="relative" ref={userNavRef}>
             <div

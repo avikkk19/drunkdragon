@@ -43,8 +43,7 @@ const Contact = () => {
             className="special-font !md:text-[6.2rem] w-full font-zentry !text-5xl !font-black !leading-[.9]"
           />
 
-          <a href="">
-            {" "}
+          <a href="https://www.google.com/search?q=f1&sca_esv=378b3737e56186e4&sxsrf=ADLYWIJAtSN5-rE3nPPwamddV8m8OJoY8w%3A1735576000876&source=hp&ei=wMlyZ--vMMqM2roP193I6QM&iflsig=AL9hbdgAAAAAZ3LX0PfDqEwL5WfvGFjEOoy_9ZcjKJJN&gs_ssp=eJzj4tDP1TcwqqgyMmD0YkozBAAcMQN4&oq=f1&gs_lp=Egdnd3Mtd2l6IgJmMSoCCAIyChAjGIAEGCcYigUyChAjGIAEGCcYigUyCBAuGIAEGLEDMggQABiABBixAzILEC4YgAQYsQMY5QQyBRAAGIAEMgsQABiABBixAxiKBTIIEAAYgAQYsQMyCBAAGIAEGLEDMggQLhiABBixA0j3NFCFJFiwJXABeACQAQCYAX-gAf0BqgEDMC4yuAEByAEA-AEBmAIDoAKOAqgCCsICBxAjGCcY6gLCAgcQLhgnGOoCwgIOEC4YgAQYsQMY0QMYxwHCAgsQABiABBixAxiDAcICDhAAGIAEGLEDGIMBGIoFwgIREC4YgAQYsQMY0QMYgwEYxwGYAwfxBZbR_yjK2WSjkgcDMS4yoAeUGA&sclient=gws-wiz#cobssid=s">
             <Button title="contact us" containerClass="mt-10 cursor-pointer" />
           </a>
         </div>

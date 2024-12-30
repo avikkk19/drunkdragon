@@ -75,10 +75,7 @@ const FloatingImage = () => {
             </div>
 
             {/* for the rounded corner */}
-            <svg
-              className="invisible absolute size-0"
-              xmlns="http://www"
-            >
+            <svg className="invisible absolute size-0" xmlns="http://www">
               <defs>
                 <filter id="flt_tag">
                   <feGaussianBlur
@@ -109,11 +106,9 @@ const FloatingImage = () => {
               Sir Lewis Hamilton.
             </p>
 
-            <Button
-              id="realm-btn"
-              title="handles"
-              containerClass="mt-5"
-            />
+            <a href="https://x.com/lewishamilton">
+              <Button id="realm-btn" title="handles" containerClass="mt-5" />
+            </a>
           </div>
         </div>
       </div>

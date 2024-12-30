@@ -38,14 +38,14 @@ const About = () => {
   }, []); // Empty dependency array since we want this to run once
 
   return (
-    <div id="about" className="min-h-screen w-screen">
+    <div id="about" className="min-h-screen w-screen bg">
       <div className="relative mb-8 mt-36 flex flex-col items-center gap-5">
         <p className="font-general text-sm uppercase md:text-[10px]">
           phew phew
         </p>
 
         <AnimatedTitle
-          title="Disc<b>o</b>ver the world's <br /> best <b>D</b>river <b>rn</b>"
+          title="Curre<b>e</b>nt world <br /> world <b>cham</b>pi <b>on</b>"
           containerClass="mt-5 !text-black text-center"
         />
 
