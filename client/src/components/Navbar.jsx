@@ -12,15 +12,10 @@ const NavBar = () => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isIndicatorActive, setIsIndicatorActive] = useState(false);
   const [userNavPannel, setUserNavPannel] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Added for mobile menu
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const userNavRef = useRef(null);
   const audioElementRef = useRef(null);
-  const navContainerRef = useRef(null);
   const location = useLocation();
-
-  const { y: currentScrollY } = useWindowScroll();
-  const [isNavVisible, setIsNavVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   const {
     userAuth,
@@ -31,7 +26,6 @@ const NavBar = () => {
     setUserNavPannel((prev) => !prev);
   };
 
-  // Added for mobile menu toggle
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
@@ -71,70 +65,38 @@ const NavBar = () => {
   }, [isAudioPlaying]);
 
   useEffect(() => {
-    if (!navContainerRef.current) return;
-
-    if (currentScrollY === 0) {
-      setIsNavVisible(true);
-      navContainerRef.current.classList.remove("floating-nav");
-    } else if (currentScrollY > lastScrollY) {
-      setIsNavVisible(false);
-      navContainerRef.current.classList.add("floating-nav");
-    } else if (currentScrollY < lastScrollY) {
-      setIsNavVisible(true);
-      navContainerRef.current.classList.add("floating-nav");
-    }
-
-    setLastScrollY(currentScrollY);
-  }, [currentScrollY, lastScrollY]);
-
-  useEffect(() => {
-    if (navContainerRef.current) {
-      gsap.to(navContainerRef.current, {
-        y: isNavVisible ? 0 : -100,
-        opacity: isNavVisible ? 1 : 0,
-        duration: 0.2,
-      });
-    }
-  }, [isNavVisible]);
-
-  // Added effect to close mobile menu on route change
-  useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
 
   const renderAuthButtons = () => {
     if (access_token) {
       return (
-        <>
-          <div className="relative" ref={userNavRef}>
-            <div
-              className="w-12 ml-0 h-12 mt-1 cursor-pointer"
-              onClick={handleUserNavPannel}
-            >
-              {profile_img ? (
-                <img
-                  src={profile_img}
-                  alt="Profile"
-                  className="w-full h-full object-cover rounded-full"
-                />
-              ) : (
-                <span className="w-full h-full bg-gray-300 rounded-full flex items-center justify-center">
-                  No Image
-                </span>
-              )}
-            </div>
-            {userNavPannel && <UserNavigationPannel />}
+        <div className="relative" ref={userNavRef}>
+          <div
+            className="w-12 ml-0 h-12 mt-1 cursor-pointer"
+            onClick={handleUserNavPannel}
+          >
+            {profile_img ? (
+              <img
+                src={profile_img}
+                alt="Profile"
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <span className="w-full h-full bg-[#cacaca] rounded-full flex items-center justify-center">
+                No Image
+              </span>
+            )}
           </div>
-        </>
+          {userNavPannel && <UserNavigationPannel />}
+        </div>
       );
     }
 
     return (
-      <>
-        <Link className="btn-dark py-2" to="/signin">
-          signin to continue
-        </Link>
-      </>
+      <Link className="btn-dark py-2 -mt-3" to="/signin">
+        Sign in to continue
+      </Link>
     );
   };
 
@@ -143,7 +105,7 @@ const NavBar = () => {
       return (
         <Link
           to="/"
-          className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent"
+          className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent text-black"
           onClick={() => setIsMobileMenuOpen(false)}
         >
           Home
@@ -155,7 +117,7 @@ const NavBar = () => {
       return (
         <Link
           to={`/${item}`}
-          className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent"
+          className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent text-black"
           onClick={() => setIsMobileMenuOpen(false)}
         >
           {item}
@@ -168,7 +130,7 @@ const NavBar = () => {
         return (
           <a
             href={`#${item.toLowerCase()}`}
-            className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent"
+            className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent text-black"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             {item}
@@ -176,13 +138,13 @@ const NavBar = () => {
         );
       }
       return (
-        <Link
+        <Linkx
           to={`/#${item.toLowerCase()}`}
-          className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent"
+          className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent text-black"
           onClick={() => setIsMobileMenuOpen(false)}
         >
           {item}
-        </Link>
+        </Linkx>
       );
     }
 
@@ -190,96 +152,50 @@ const NavBar = () => {
   };
 
   return (
-    <div
-      ref={navContainerRef}
-      className="fixed inset-x-0 top-0 md:top-4 z-50 h-16 border-none transition-all duration-700 md:sm:inset-x-6"
-    >
-      <header className="absolute top-1/2 w-full -translate-y-1/2  shadow-sm md:rounded-xl md:bg-black/80 md:backdrop-blur-sm">
-        <nav className="flex size-full items-center justify-between p-4">
-          <div className="flex items-center gap-7">
-            <Link to="/">
-              <img
-                src="/img/lewislogo.jpg"
-                alt="logo"
-                className="w-8 md:w-10"
-              />
-            </Link>
-          </div>
+    <div className="fixed inset-x-0 top-0 z-50 h-16 border-[#18181b] bg-white/10 backdrop-blur-sm rounded-xl mx-3 mt-2">
+      <header className="w-full h-full">
+        <nav className="flex items-center justify-between h-full px-4">
+          <Link to="/">
+            <img src="/img/lewislogopng.png" alt="logo" className="w-8 md:w-10" />
+          </Link>
 
-          {/* Hamburger Menu Button */}
           <button
             onClick={toggleMobileMenu}
-            className="md:hidden p-2 rounded-lg hover:bg-black/50"
+            className="md:hidden p-2 rounded-lg hover:bg-white"
             aria-label="Toggle menu"
           >
             <div
-              className={clsx("w-6 h-0.5 bg-gray-900 transition-all", {
+              className={clsx("w-6 h-0.5 bg-black transition-all", {
                 "transform rotate-45 translate-y-2": isMobileMenuOpen,
               })}
             ></div>
             <div
-              className={clsx("w-6 h-0.5 bg-gray-900 my-1.5", {
+              className={clsx("w-6 h-0.5 bg-black my-1.5", {
                 "opacity-0": isMobileMenuOpen,
               })}
             ></div>
             <div
-              className={clsx("w-6 h-0.5 bg-gray-900 transition-all", {
+              className={clsx("w-6 h-0.5 bg-black transition-all", {
                 "transform -rotate-45 -translate-y-2": isMobileMenuOpen,
               })}
             ></div>
           </button>
 
-          {/* Mobile Menu */}
-          <div
-            className={clsx(
-              "absolute top-[0px] left-0 right-0 bg-black/90 shadow-sm border-t transform transition-all duration-300 ease-in-out md:hidden",
-              {
-                "translate-y-0 opacity-100 visible": isMobileMenuOpen,
-                "translate-y-4 opacity-0 invisible": !isMobileMenuOpen,
-              }
-            )}
-          >
-            <div className="py-2">
-              {navItems.map((item, index) => (
-                <div key={index} className="">
-                  {renderNavLink(item)}
-                </div>
-              ))}
-              <div className="p-2">{renderAuthButtons()}</div>
-            </div>
+          <div className={clsx("hidden md:flex gap-6 mt-4")}>
+            {navItems.map((item, index) => (
+              <span key={index}>{renderNavLink(item)}</span>
+            ))}
+            {renderAuthButtons()}
           </div>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex h-full items-center gap-6">
-            <div className="flex gap-6">
+          {isMobileMenuOpen && (
+            <div className="absolute top-full left-0 w-full bg-white shadow-lg">
               {navItems.map((item, index) => (
-                <span key={index}>{renderNavLink(item)}</span>
+                <div key={index}>{renderNavLink(item)}</div>
               ))}
+              <div>{renderAuthButtons()}</div>
             </div>
-
-            <div className="flex items-center space-x-0.5">
-              <div onClick={toggleAudioIndicator} className="cursor-grab mr-4">
-                <audio
-                  ref={audioElementRef}
-                  className="hidden"
-                  src="/audio/skyfall.mp3"
-                  loop
-                />
-                {[1, 2, 3, 4].map((bar) => (
-                  <div
-                    key={bar}
-                    className={clsx("indicator-line", {
-                      active: isIndicatorActive,
-                    })}
-                    style={{
-                      animationDelay: `${bar * 0.1}s`,
-                    }}
-                  />
-                ))}
-              </div>
-              {renderAuthButtons()}
-            </div>
-          </div>
+          )}
         </nav>
       </header>
     </div>
