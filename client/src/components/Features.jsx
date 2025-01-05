@@ -52,12 +52,13 @@ export const BentoCard = ({ src, title, description, isComingSoon }) => {
       y: event.clientY - rect.top,
     });
   };
-
+ 
   const handleMouseEnter = () => setHoverOpacity(1);
   const handleMouseLeave = () => setHoverOpacity(0);
 
   return (
-    <div className="relative size-full ">
+    
+    <div className="relative size-full" id="features">
       <video
         src={src}
         loop
@@ -99,16 +100,16 @@ export const BentoCard = ({ src, title, description, isComingSoon }) => {
 };
 
 const Features = () => (
-  <section className="bg-black pb-52">
+  <section className="bg-black pb-52 mt-32">
     <div className="container mx-auto px-3 md:px-10">
-      <div className="px-5 py-32">
+      {/* <div className="px-5 py-32">
         <p className="font-circular-web text-lg text-blue-50">
           Into the world of Max Verstappen
         </p>
         <p className="max-w-md font-circular-web text-lg text-blue-50 opacity-50">
           born 30 September 1997 is a Dutch and Belgian 4 racing driver, who competes under the Dutch flag in Formula One for Red Bull Racing. Verstappen has won four Formula One World Drivers' Championship titles, which he won consecutively from 2021 to 2024 with Red Bull, and has won 63 Grands Prix across 10 seasons.
         </p>
-      </div>
+      </div> */}
 
       <BentoTilt className="border-hsla relative mb-7 h-96 w-full overflow-hidden rounded-md md:h-[65vh]">
         <BentoCard

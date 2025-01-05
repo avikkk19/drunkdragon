@@ -17,6 +17,24 @@ import { lookInSession } from "./common/Session";
 // Create context
 export const UserContext = createContext({});
 
+// Home page component
+const Home = () => (
+  <>
+    <Hero />
+    <About />
+    <Contact />
+  </>
+);
+
+// Protected route component
+const ProtectedRoute = ({ children }) => {
+  const { userAuth } = React.useContext(UserContext);
+  if (!userAuth.access_token) {
+    return <Navigate to="/signin" />;
+  }
+  return children;
+};
+
 const App = () => {
   const [userAuth, setUserAuth] = useState({});
 
@@ -36,34 +54,36 @@ const App = () => {
 
   return (
     <UserContext.Provider value={{ userAuth, setUserAuth }}>
+      <NavBar />
       <main>
         <Routes>
-          <Route
-            path="/"
-            element={
-              userAuth.access_token ? (
-                <>
-                  <Hero />
-                  <About />
-                  <Features />
-                  <Story />
-                  <Contact />
-                </>
-              ) : (
-                <>
-                  <Contact />
-                </>
-              )
-            }
-          />
+          {/* Public routes */}
+          <Route path="/" element={<Home />} />
           <Route path="/signin" element={<UserAuthForm type="signin" />} />
           <Route path="/signup" element={<UserAuthForm type="signup" />} />
-          {/* Add a catch-all route */}
+
+          {/* Protected routes */}
+          <Route
+            path="/features"
+            element={
+              <ProtectedRoute>
+                <Features />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/story"
+            element={
+              <ProtectedRoute>
+                <Story />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Catch-all route */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
-      <NavBar />
-
       <Footer />
     </UserContext.Provider>
   );

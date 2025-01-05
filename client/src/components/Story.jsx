@@ -46,7 +46,7 @@ const FloatingImage = () => {
   };
 
   return (
-    <div id="story" className="min-h-dvh w-screen bg-black text-blue-50">
+    <div id="story" className=" relative min-h-dvh w-screen bg-black text-blue-50 mt-32 mb-32">
       <div className="flex size-full flex-col items-center py-10 pb-24">
         <p className="font-general text-sm uppercase md:text-[10px]">
           Greatest of all time

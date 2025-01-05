@@ -1,47 +1,49 @@
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import AnimatedTitle from "./AnimatedTitle";
+import { useRef, useLayoutEffect } from "react";
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
 const About = () => {
-  useGSAP(() => {
-    // Create the timeline
-    const clipAnimation = gsap.timeline({
-      scrollTrigger: {
-        trigger: "#clip",
-        start: "center center",
-        end: "+=800 center",
-        scrub: 0.5,
-        pin: true,
-        pinSpacing: true,
+  const containerRef = useRef(null);
 
-        // Add markers for debugging if needed
-        // markers: true,
-      },
+  useLayoutEffect(() => {
+    let mm = gsap.matchMedia();
+
+    mm.add("(min-width: 0px)", () => {
+      const animation = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current.querySelector("#clip"),
+          start: "center center",
+          end: "+=800 center",
+          scrub: 0.5,
+          pin: true,
+          pinSpacing: true,
+        },
+      });
+
+      animation.to(".mask-clip-path", {
+        width: "100vw",
+        height: "100vh",
+        borderRadius: 0,
+      });
+
+      return () => {
+        animation.kill();
+        ScrollTrigger.getAll().forEach((st) => st.kill());
+      };
     });
 
-    // Add the animation
-    clipAnimation.to(".mask-clip-path", {
-      width: "100vw",
-      height: "100vh",
-      borderRadius: 0,
-    });
-
-    // Cleanup function
-    return () => {
-      clipAnimation.kill();
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
-  }, []); // Empty dependency array since we want this to run once
+    return () => mm.revert();
+  }, []);
 
   return (
-    <div id="about" className="min-h-screen w-screen bg">
+    <div id="about" ref={containerRef} className="min-h-screen w-screen bg">
       <div className="relative mb-8 mt-36 flex flex-col items-center gap-5">
         <p className="font-general text-sm uppercase md:text-[10px]">
-          phew phew
+          WDC
         </p>
 
         <AnimatedTitle
@@ -50,10 +52,9 @@ const About = () => {
         />
 
         <div className="about-subtext">
-          <p>The Game of Max Verstappen</p>
+          <p className="uppercase"> Max Verstappen</p>
           <p className="text-gray-500">
-            Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Deserunt, nulla.
+            4 times champion of the world
           </p>
         </div>
       </div>
@@ -66,6 +67,19 @@ const About = () => {
             className="absolute left-0 top-0 size-full object-cover"
           />
         </div>
+        
+      </div>
+      <div className="relative px-5 py-32 mx-6">
+        <p className="font-circular-web text-6xl text-black uppercase mb-6 font-bold">
+          Into the world of Max Verstappen.
+        </p>
+        <p className="max-w-lg font-circular-web text-lg text-black opacity-70">
+          born 30 September 1997 is a Dutch and Belgian 4 racing driver, who
+          competes under the Dutch flag in Formula One for Red Bull Racing.
+          Verstappen has won four Formula One World Drivers' Championship
+          titles, which he won consecutively from 2021 to 2024 with Red Bull,
+          and has won 63 Grands Prix across 10 seasons.
+        </p>
       </div>
     </div>
   );
