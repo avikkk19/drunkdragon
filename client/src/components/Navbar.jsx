@@ -73,7 +73,7 @@ const NavBar = () => {
       return (
         <div className="relative" ref={userNavRef}>
           <div
-            className="w-12 ml-0 h-12 mt-1 cursor-pointer"
+            className="w-12 ml-0 h-12 mt-1 cursor-pointer "
             onClick={handleUserNavPannel}
           >
             {profile_img ? (
@@ -83,7 +83,7 @@ const NavBar = () => {
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
-              <span className="w-full h-full bg-[#cacaca] rounded-full flex items-center justify-center">
+              <span className="w-full h-full rounded-full flex items-center justify-center">
                 No Image
               </span>
             )}
@@ -138,13 +138,13 @@ const NavBar = () => {
         );
       }
       return (
-        <Linkx
+        <Link
           to={`/#${item.toLowerCase()}`}
           className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent text-black"
           onClick={() => setIsMobileMenuOpen(false)}
         >
           {item}
-        </Linkx>
+        </Link>
       );
     }
 
@@ -156,7 +156,11 @@ const NavBar = () => {
       <header className="w-full h-full">
         <nav className="flex items-center justify-between h-full px-4">
           <Link to="/">
-            <img src="/img/lewislogopng.png" alt="logo" className="w-8 md:w-10" />
+            <img
+              src="/img/lewislogopng.png"
+              alt="logo"
+              className="w-8 md:w-10"
+            />
           </Link>
 
           <button
@@ -181,19 +185,19 @@ const NavBar = () => {
             ></div>
           </button>
 
-          <div className={clsx("hidden md:flex gap-6 mt-4")}>
+          <div className={clsx("hidden md:flex gap-6 mt-4 ")}>
             {navItems.map((item, index) => (
               <span key={index}>{renderNavLink(item)}</span>
             ))}
             {renderAuthButtons()}
           </div>
-
+          {/* mobile open */}
           {isMobileMenuOpen && (
-            <div className="absolute top-full left-0 w-full bg-white shadow-lg">
+            <div className="absolute top-full left-0 w-full mt-2 shadow-lg bg-black/80 rounded-lg backdrop-blur-3xl">
               {navItems.map((item, index) => (
                 <div key={index}>{renderNavLink(item)}</div>
               ))}
-              <div>{renderAuthButtons()}</div>
+              <div className="ml-10 mb-3">{renderAuthButtons()}</div>
             </div>
           )}
         </nav>
