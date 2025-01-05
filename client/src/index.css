@@ -159,16 +159,16 @@ body {
 }
 
 .input-box {
-  @apply w-[100%] rounded-md p-4 bg-grey pl-12 border border-grey focus:bg-transparent placeholder:text-black;
+  @apply w-[100%] rounded-md p-4 bg-white pl-12 border border-grey focus:bg-transparent placeholder:text-black text-white;
 }
 
 input:disabled,
 input:disabled ~ .input-icon {
-  @apply opacity-50;
+  @apply opacity-50 text-black;
 }
 
 .input-icon {
-  @apply absolute left-4 top-1/2 -translate-y-1/2;
+  @apply absolute left-4 top-1/2 -translate-y-1/2 text-white;
 }
 .hide {
   @apply opacity-0 pointer-events-none duration-100;

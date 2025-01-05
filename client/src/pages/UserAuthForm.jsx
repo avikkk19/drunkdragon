@@ -107,7 +107,7 @@ const userAuthThroughServer = (serverRoute, formData) => {
          className="w-[80%] max-w-[400px]"
          onSubmit={handleSubmit}
        >
-         <h1 className="text-4xl font-gelasio capitalize text-center mb-24">
+         <h1 className="text-4xl font-gelasio capitalize text-center mb-24 text-white mt-10">
            {type === "signin" ? "Welcome Back" : "Register Now"}
          </h1>
          {type !== "signin" && (
@@ -123,7 +123,6 @@ const userAuthThroughServer = (serverRoute, formData) => {
            type="email"
            placeholder="Email"
            icon="fi-rr-envelope"
-           
          />
          <InputBox
            name="password"
@@ -139,7 +138,7 @@ const userAuthThroughServer = (serverRoute, formData) => {
            <h1 className="w-1/2 border-black" />
          </div>
          <button
-           className=" bg-lime-300 flex items-center justify-center gap-4 w-[90%] center rounded-lg py-2"
+           className=" bg-[#cacaca] flex items-center justify-center gap-4 w-[90%] center rounded-lg py-2 text-black"
            onClick={handleGoogleAuth}
          >
            <img src={googleIcon} alt="google" className="w-5" />
@@ -147,17 +146,24 @@ const userAuthThroughServer = (serverRoute, formData) => {
          </button>
 
          {type === "signin" ? (
-           <p className="mt-6  text-slate-800 text-xl text-center">
+           <p className="mt-6  text-[#cacaca] text-xl text-center">
              Don't have an account?
-             <Link to="/signup" className="underline text-black text-xl ml-1">
+             <Link
+               to="/signup"
+               className="underline text-[#cacaca] text-xl ml-1"
+             >
                Join Us
              </Link>
            </p>
          ) : (
-           <p className="mt-6  text-slate-800 text-xl text-center">
+           <p className="mt-6  text-[#cacaca] text-xl text-center">
              Already a member?
-             <Link to="/signin" className="underline text-black text-xl ml-1">
+             <Link
+               to="/signin"
+               className="underline text-[#cacaca] text-xl ml-1"
+             >
                Sign In
+             
              </Link>
            </p>
          )}

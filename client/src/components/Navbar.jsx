@@ -79,7 +79,7 @@ const NavBar = () => {
           ref={userNavRef}
         >
           <div
-            className="w-12 ml-0 h-12  cursor-pointer" 
+            className="w-12 ml-0 h-12 cursor-pointer" 
             onClick={handleUserNavPannel}
           >
             {profile_img ? (
@@ -101,7 +101,7 @@ const NavBar = () => {
 
     return (
       <Link
-        className={clsx("btn-dark py-2", {
+        className={clsx("btn-dark py-2 -mt-[5px]", {
           "-mt-3": !isMobile,
         })}
         to="/signin"
@@ -196,7 +196,7 @@ const NavBar = () => {
             ></div>
           </button>
 
-          <div className={clsx("hidden md:flex gap-6 ")}>
+          <div className={clsx("hidden md:flex gap-6 mt-2")}>
             {navItems.map((item, index) => (
               <span className="mt-2" key={index}>{renderNavLink(item)}</span>
             ))}
