@@ -68,12 +68,18 @@ const NavBar = () => {
     setIsMobileMenuOpen(false);
   }, [location]);
 
-  const renderAuthButtons = () => {
+  const renderAuthButtons = (isMobile = false) => {
     if (access_token) {
       return (
-        <div className="relative" ref={userNavRef}>
+        <div
+          className={clsx("relative", {
+            "ml-10 mb-3": isMobile,
+            "": !isMobile,
+          })}
+          ref={userNavRef}
+        >
           <div
-            className="w-12 ml-0 h-12 mt-1 cursor-pointer "
+            className="w-12 ml-0 h-12  cursor-pointer" 
             onClick={handleUserNavPannel}
           >
             {profile_img ? (
@@ -94,7 +100,12 @@ const NavBar = () => {
     }
 
     return (
-      <Link className="btn-dark py-2 -mt-3" to="/signin">
+      <Link
+        className={clsx("btn-dark py-2", {
+          "-mt-3": !isMobile,
+        })}
+        to="/signin"
+      >
         Sign in to continue
       </Link>
     );
@@ -105,7 +116,7 @@ const NavBar = () => {
       return (
         <Link
           to="/"
-          className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent text-black"
+          className="nav-hover-btn block w-full p-2 hover:bg-gray-50 md:inline md:w-auto md:p-0 md:hover:bg-transparent text-black "
           onClick={() => setIsMobileMenuOpen(false)}
         >
           Home
@@ -152,7 +163,7 @@ const NavBar = () => {
   };
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 h-16 border-[#18181b] bg-white/10 backdrop-blur-sm rounded-xl mx-3 mt-2">
+    <div className="fixed inset-x-0 top-0 z-50 h-16 border-[#18181b] bg-white/10 backdrop-blur-sm rounded-xl mx-3 mt-2 text-black">
       <header className="w-full h-full">
         <nav className="flex items-center justify-between h-full px-4">
           <Link to="/">
@@ -185,19 +196,19 @@ const NavBar = () => {
             ></div>
           </button>
 
-          <div className={clsx("hidden md:flex gap-6 mt-4 ")}>
+          <div className={clsx("hidden md:flex gap-6 ")}>
             {navItems.map((item, index) => (
-              <span key={index}>{renderNavLink(item)}</span>
+              <span className="mt-2" key={index}>{renderNavLink(item)}</span>
             ))}
-            {renderAuthButtons()}
+            {renderAuthButtons(false)}
           </div>
           {/* mobile open */}
           {isMobileMenuOpen && (
-            <div className="absolute top-full left-0 w-full mt-2 shadow-lg bg-black/80 rounded-lg backdrop-blur-3xl">
+            <div className="absolute top-full left-0 w-full mt-2 shadow-lg bg-black/80 rounded-lg backdrop-blur-3xl ">
               {navItems.map((item, index) => (
                 <div key={index}>{renderNavLink(item)}</div>
               ))}
-              <div className="ml-10 mb-3">{renderAuthButtons()}</div>
+              {renderAuthButtons(true)}
             </div>
           )}
         </nav>
