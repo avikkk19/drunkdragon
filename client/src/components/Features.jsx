@@ -116,7 +116,7 @@ const Features = () => (
           src="videos/realracing1.mp4"
           title={
             <>
-              Avi's <b>master</b>class
+              Avi's <b>master</b>classuu
             </>
           }
           description="lorem."
