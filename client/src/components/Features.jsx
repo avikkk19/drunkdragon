@@ -113,7 +113,7 @@ const Features = () => (
 
       <BentoTilt className="border-hsla relative mb-7 h-96 w-full overflow-hidden rounded-md md:h-[65vh]">
         <BentoCard
-          src="videos/realracing1.mp4"
+          src="videos/realracing33.mp4"
           title={
             <>
               Avi's <b>master</b>classuu
