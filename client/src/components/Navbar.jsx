@@ -2,11 +2,12 @@ import clsx from "clsx";
 import gsap from "gsap";
 import { useWindowScroll } from "react-use";
 import { useEffect, useRef, useState, useContext } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { UserContext } from "../App";
 import UserNavigationPannel from "./UserNavigation";
 
-const navItems = ["", "features", "about", "story", "Contact"];
+const navItems = ["twitter", "features", "about", "story", "Contact"];
 
 const NavBar = () => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -124,7 +125,7 @@ const NavBar = () => {
       );
     }
 
-    if (item === "features" || item === "story") {
+    if (item === "features" || item === "story" || item === "twitter") {
       return (
         <Link
           to={`/${item}`}
@@ -136,7 +137,7 @@ const NavBar = () => {
       );
     }
 
-    if (item === "about" || item === "Contact") {
+    if (item === "about" || item === "Contact" ) {
       if (location.pathname === "/") {
         return (
           <a

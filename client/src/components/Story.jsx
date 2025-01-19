@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import { useRef } from "react";
+import  react,{ useRef } from "react";
 
 import Button from "./Button";
 import AnimatedTitle from "./AnimatedTitle";

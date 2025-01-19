@@ -13,6 +13,8 @@ import UserAuthForm from "./pages/UserAuthForm";
 
 // Utils import
 import { lookInSession } from "./common/Session";
+import TwitterTimeline from "./components/Twittertm";
+import Contactme from "./pages/Contact";
 
 // Create context
 export const UserContext = createContext({});
@@ -23,6 +25,7 @@ const Home = () => (
     <Hero />
     <About />
     <Contact />
+
   </>
 );
 
@@ -61,6 +64,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<UserAuthForm type="signin" />} />
           <Route path="/signup" element={<UserAuthForm type="signup" />} />
+          <Route path="/contact" element={<Contactme />} />
 
           {/* Protected routes */}
           <Route
@@ -79,7 +83,9 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-
+            <Route path="/twitter" element={<ProtectedRoute>
+              <TwitterTimeline/>
+            </ProtectedRoute>} />
           {/* Catch-all route */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
