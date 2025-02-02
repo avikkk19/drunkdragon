@@ -16,6 +16,7 @@
     "@flaticon/flaticon-uicons": "^3.3.1",
     "@gsap/react": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.1",
+    "@supabase/supabase-js": "^2.47.16",
     "aws": "^0.0.3-2",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",

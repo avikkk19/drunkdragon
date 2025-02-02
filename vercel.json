@@ -1,8 +1,16 @@
 {
-  "rewrites": [
+  "version": 2,
+  "name": "drunkdragon",
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "../server/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/"
     }
   ]
 }
