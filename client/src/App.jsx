@@ -11,7 +11,7 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import UserAuthForm from "./pages/UserAuthForm";
 
-// Utils import
+//
 import { lookInSession } from "./common/Session";
 import TwitterTimeline from "./components/Twittertm";
 import Contactme from "./pages/Contact";
