@@ -62,7 +62,7 @@ const userAuthThroughServer = (serverRoute, formData) => {
     }
 
     // Email validation
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(email)) { 
       return toast.error("Invalid email");
     }
 

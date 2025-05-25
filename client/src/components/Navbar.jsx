@@ -88,6 +88,7 @@ const NavBar = () => {
                 src={profile_img}
                 alt="Profile"
                 className="w-full h-full object-cover rounded-full"
+                href="/"
               />
             ) : (
               <span className="w-full h-full rounded-full flex items-center justify-center">

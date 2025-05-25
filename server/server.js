@@ -19,6 +19,7 @@ import { fileURLToPath } from "url";
 // Schema import
 import User from "./Schema/User.js";
 
+// Load environment variables
 dotenv.config(); // Load environment variables from .env
 const server = express();
 let PORT = 3000;
@@ -40,14 +41,17 @@ const __dirname = path.dirname(__filename);
 
 server.use(express.static(path.join(__dirname, "/client/dist")));
 
-
-// MongoDB connection
-mongoose
-  .connect(process.env.DB_LOCATION, {
+// MongoDB connection with error handling
+try {
+  await mongoose.connect(process.env.DB_LOCATION, {
     autoIndex: true,
-  })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.log("Failed to connect to MongoDB", err));
+  });
+  console.log("Connected to MongoDB successfully");
+} catch (error) {
+  console.error("MongoDB connection error:", error);
+  console.log("DB_LOCATION value:", process.env.DB_LOCATION);
+  console.log('Loaded DB_LOCATION:', process.env.DB_LOCATION);
+}
 
 // Function to format data to send to the client
 const formatDataSend = (user) => {
@@ -89,7 +93,6 @@ server.use((req, res, next) => {
   res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
   next();
 });
-
 
 // Signup endpoint
 server.post("/signup", async (req, res) => {
@@ -218,7 +221,7 @@ server.post("/google-auth", async (req, res) => {
           personal_info: {
             fullname: name,
             email,
-           
+
             username,
           },
           google_auth: true,
@@ -237,7 +240,7 @@ server.post("/google-auth", async (req, res) => {
       }
     })
     .catch((err) => {
-      console.error("google Auth error :",err)
+      console.error("google Auth error :", err);
       return res
         .status(500)
         .json({ error: "Authentication error, try another Google account" });
