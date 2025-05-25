@@ -65,6 +65,9 @@ const App = () => {
           <Route path="/signin" element={<UserAuthForm type="signin" />} />
           <Route path="/signup" element={<UserAuthForm type="signup" />} />
           <Route path="/contact" element={<Contactme />} />
+          <Route path="/features" element={<Features />} />
+          <Route path="/story" element={<Story />} />
+          <Route path="/TwitterTimeline" element={<TwitterTimeline />} />
 
           {/* Protected routes */}
           <Route
