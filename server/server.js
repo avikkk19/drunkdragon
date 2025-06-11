@@ -17,20 +17,43 @@ import User from "./Schema/User.js";
 // Load environment variables
 dotenv.config();
 const server = express();
-const PORT = 3000;
 
 // Middleware
 server.use(express.json());
-server.use(cors());
+server.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://drunkdragon.vercel.app', 'https://www.drunkdragon.vercel.app'] 
+    : 'http://localhost:5173',
+  credentials: true
+}));
 
-// Firebase Admin initialization
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccountKey),
-});
+// Firebase Admin initialization (only initialize if not already initialized)
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccountKey),
+  });
+}
 
-// Define __dirname for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// MongoDB connection
+const connectDB = async () => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(process.env.DB_LOCATION, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        autoIndex: true
+      });
+      console.log('MongoDB Connected');
+    }
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    // Don't exit process in serverless environment
+    return error;
+  }
+};
+
+// Connect to MongoDB at startup
+connectDB();
 
 // Validation regex
 const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -51,29 +74,6 @@ const formatDataSend = (user) => {
   };
 };
 
-// MongoDB connection with detailed logging
-mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
-});
-
-mongoose.connection.on('connected', () => {
-  console.log('Connected to MongoDB successfully');
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected');
-});
-
-try {
-  await mongoose.connect(process.env.DB_LOCATION, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    autoIndex: true
-  });
-} catch (error) {
-  console.error("MongoDB connection error:", error);
-}
-
 // Enhanced error handling middleware
 server.use((err, req, res, next) => {
   console.error('Global error handler:', err);
@@ -83,10 +83,16 @@ server.use((err, req, res, next) => {
   });
 });
 
+// Wrap routes in async function to ensure DB connection
+const withDB = (handler) => async (req, res) => {
+  await connectDB();
+  return handler(req, res);
+};
+
 // Signin endpoint with enhanced logging
-server.post("/signin", async (req, res) => {
+server.post("/signin", withDB(async (req, res) => {
   try {
-    console.log("Received signin request with body:", req.body);
+    console.log("Received signin request:", req.body);
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -125,10 +131,10 @@ server.post("/signin", async (req, res) => {
       details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
-});
+}));
 
 // Signup endpoint with enhanced logging
-server.post("/signup", async (req, res) => {
+server.post("/signup", withDB(async (req, res) => {
   try {
     console.log("Received signup request:", req.body);
     const { fullname, email, password } = req.body;
@@ -215,68 +221,39 @@ server.post("/signup", async (req, res) => {
       details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
-});
+}));
 
-server.post("/google-auth", async (req, res) => {
-  let { access_token } = req.body;
+server.post("/google-auth", withDB(async (req, res) => {
+  try {
+    const { access_token } = req.body;
+    const decodedUser = await getAuth().verifyIdToken(access_token);
+    const { email, name, picture } = decodedUser;
+    
+    let user = await User.findOne({ "personal_info.email": email });
+    
+    if (!user) {
+      const username = await generateUsername(email);
+      user = new User({
+        personal_info: {
+          fullname: name,
+          email,
+          profile_img: picture,
+          username
+        },
+        google_auth: true
+      });
+      await user.save();
+    }
 
-  getAuth()
-    .verifyIdToken(access_token)
-    .then(async (decodedUser) => {
-      let { email, name, picture } = decodedUser;
-      picture = picture.replace("s96-c", "s384-c");
-
-      let user = await User.findOne({ "personal_info.email": email })
-        .select("personal_info.fullname personal_info.profile_img google_auth")
-        .then((u) => {
-          return u || null;
-        })
-        .catch((err) => {
-          return res.status(403).json({ error: err.message });
-        });
-
-      if (user) {
-        if (!user.google_auth) {
-          return res
-            .status(403)
-            .json({ error: "This user is not Google authenticated" });
-        } else {
-          return res.status(200).json(formatDataSend(user));
-        }
-      } else {
-        let username = await generateUsername(email);
-
-        user = new User({
-          personal_info: {
-            fullname: name,
-            email,
-
-            username,
-          },
-          google_auth: true,
-        });
-
-        await user
-          .save()
-          .then((u) => {
-            user = u;
-          })
-          .catch((err) => {
-            return res.status(500).json({ error: "Server error" });
-          });
-
-        return res.status(200).json(formatDataSend(user));
-      }
-    })
-    .catch((err) => {
-      console.error("google Auth error :", err);
-      return res
-        .status(500)
-        .json({ error: "Authentication error, try another Google account" });
+    return res.status(200).json(formatDataSend(user));
+  } catch (err) {
+    console.error("Error in Google auth:", err);
+    return res.status(500).json({
+      error: "An error occurred during Google authentication",
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
-});
+  }
+}));
 
-// Start server
-server.listen(PORT, () => {
-  console.log("listening on port " + PORT);
-});
+// Export for Vercel
+export default server;
