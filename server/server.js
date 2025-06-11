@@ -16,11 +16,11 @@ import User from "./Schema/User.js";
 
 // Load environment variables
 dotenv.config();
-const server = express();
+const app = express();
 
 // Middleware
-server.use(express.json());
-server.use(cors({
+app.use(express.json());
+app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://drunkdragon.vercel.app', 'https://www.drunkdragon.vercel.app'] 
     : 'http://localhost:5173',
@@ -36,28 +36,20 @@ if (!admin.apps.length) {
 
 // MongoDB connection
 const connectDB = async () => {
+  if (mongoose.connections[0].readyState) return;
   try {
-    if (mongoose.connection.readyState !== 1) {
-      await mongoose.connect(process.env.DB_LOCATION, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        autoIndex: true
-      });
-      console.log('MongoDB Connected');
-    }
+    await mongoose.connect(process.env.DB_LOCATION, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+    console.log('Connected to MongoDB');
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    // Don't exit process in serverless environment
-    return error;
   }
 };
 
-// Connect to MongoDB at startup
+// Ensure DB connection
 connectDB();
-
-// Validation regex
-const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
 // Helper Functions
 const formatDataSend = (user) => {
@@ -74,67 +66,35 @@ const formatDataSend = (user) => {
   };
 };
 
-// Enhanced error handling middleware
-server.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
-  res.status(500).json({
-    error: "An unexpected error occurred",
-    details: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
-
-// Wrap routes in async function to ensure DB connection
-const withDB = (handler) => async (req, res) => {
-  await connectDB();
-  return handler(req, res);
-};
-
-// Signin endpoint with enhanced logging
-server.post("/signin", withDB(async (req, res) => {
+// API Routes
+app.post("/api/signin", async (req, res) => {
   try {
     console.log("Received signin request:", req.body);
     const { email, password } = req.body;
 
     if (!email || !password) {
-      console.log("Missing credentials - Email or password not provided");
-      return res.status(400).json({
-        error: "Email and password are required"
-      });
+      return res.status(400).json({ error: "Email and password are required" });
     }
 
-    console.log("Looking up user with email:", email);
     const user = await User.findOne({ "personal_info.email": email });
-    
     if (!user) {
-      console.log("User not found for email:", email);
       return res.status(404).json({ error: "Email not found" });
     }
 
-    console.log("User found, verifying password");
     const isPasswordValid = await bcrypt.compare(password, user.personal_info.password);
-    
     if (!isPasswordValid) {
-      console.log("Invalid password for user:", email);
       return res.status(403).json({ error: "Invalid password" });
     }
 
-    console.log("Password verified, generating token");
-    const response = formatDataSend(user);
-    console.log("Sending successful response:", { ...response, access_token: '[REDACTED]' });
-    
-    return res.status(200).json(response);
-
+    return res.status(200).json(formatDataSend(user));
   } catch (err) {
     console.error("Error in signin:", err);
-    return res.status(500).json({
-      error: "An error occurred during signin",
-      details: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
+    return res.status(500).json({ error: "An error occurred during signin" });
   }
-}));
+});
 
 // Signup endpoint with enhanced logging
-server.post("/signup", withDB(async (req, res) => {
+app.post("/api/signup", async (req, res) => {
   try {
     console.log("Received signup request:", req.body);
     const { fullname, email, password } = req.body;
@@ -221,9 +181,9 @@ server.post("/signup", withDB(async (req, res) => {
       details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
-}));
+});
 
-server.post("/google-auth", withDB(async (req, res) => {
+app.post("/api/google-auth", async (req, res) => {
   try {
     const { access_token } = req.body;
     const decodedUser = await getAuth().verifyIdToken(access_token);
@@ -253,7 +213,7 @@ server.post("/google-auth", withDB(async (req, res) => {
       details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
-}));
+});
 
-// Export for Vercel
-export default server;
+// Export the Express API
+export default app;
