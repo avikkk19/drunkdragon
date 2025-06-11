@@ -1,26 +1,30 @@
 {
   "version": 2,
-  "name": "drunkdragon",
-  "buildCommand": "cd client && npm install && npm run build",
-  "outputDirectory": "client/dist",
   "builds": [
     {
-      "src": "server/server.js",
+      "src": "./server/server.js",
       "use": "@vercel/node"
     },
     {
-      "src": "client/dist/**",
-      "use": "@vercel/static"
+      "src": "./client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "npm install && npm run build",
+        "outputDirectory": "./dist"
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "server/server.js"
+      "dest": "./server/server.js"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "client/dist/$1"
+      "dest": "/client/dist/$1"
     }
   ]
 }
