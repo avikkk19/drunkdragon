@@ -10,50 +10,33 @@ import serviceAccountKey from "./mern-blog-60048-firebase-adminsdk-wet16-cda67f7
 import { getAuth } from "firebase-admin/auth";
 import path from "path";
 import { fileURLToPath } from "url";
-// const serviceAccountKey = await import(
-//   "./mern-blog-60048-firebase-adminsdk-wet16-cda67f7484.json",
-//   {
-//     assert: { type: "json" },
-//   }
-// );
+
 // Schema import
 import User from "./Schema/User.js";
 
 // Load environment variables
-dotenv.config(); // Load environment variables from .env
+dotenv.config();
 const server = express();
-let PORT = 3000;
+const PORT = 3000;
 
+// Middleware
+server.use(express.json());
+server.use(cors());
+
+// Firebase Admin initialization
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccountKey),
 });
 
-// Regex for email and password validation
-let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
-
-server.use(express.json());
-server.use(cors());
-
-// Define __dirname
+// Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-server.use(express.static(path.join(__dirname, "/client/dist")));
+// Validation regex
+const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
-// MongoDB connection with error handling
-try {
-  await mongoose.connect(process.env.DB_LOCATION, {
-    autoIndex: true,
-  });
-  console.log("Connected to MongoDB successfully");
-} catch (error) {
-  console.error("MongoDB connection error:", error);
-  console.log("DB_LOCATION value:", process.env.DB_LOCATION);
-  console.log('Loaded DB_LOCATION:', process.env.DB_LOCATION);
-}
-
-// Function to format data to send to the client
+// Helper Functions
 const formatDataSend = (user) => {
   const access_token = jwt.sign(
     { id: user._id },
@@ -68,124 +51,170 @@ const formatDataSend = (user) => {
   };
 };
 
-// Function to generate unique username
-const generateUsername = async (email) => {
-  let baseUsername = email.split("@")[0];
-  let username = baseUsername;
-
-  // Loop until a unique username is found
-  let isUsernameNotUnique = await User.exists({
-    "personal_info.username": username,
-  });
-
-  while (isUsernameNotUnique) {
-    username = `${baseUsername}${nanoid().substring(0, 5)}`;
-    isUsernameNotUnique = await User.exists({
-      "personal_info.username": username,
-    });
-  }
-
-  return username;
-};
-// for google auth
-server.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-  next();
+// MongoDB connection with detailed logging
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
 });
 
-// Signup endpoint
-server.post("/signup", async (req, res) => {
-  console.log(req.body);
-  let { fullname, email, password } = req.body;
+mongoose.connection.on('connected', () => {
+  console.log('Connected to MongoDB successfully');
+});
 
-  // Fullname validation
-  if (fullname.length < 3 || fullname.length > 20) {
-    return res.status(403).json({
-      message: "Fullname must be between 3 and 20 characters",
-    });
-  }
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
 
-  // Email validation
-  if (!emailRegex.test(email)) {
-    return res.status(403).json({ message: "Invalid email" });
-  }
+try {
+  await mongoose.connect(process.env.DB_LOCATION, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    autoIndex: true
+  });
+} catch (error) {
+  console.error("MongoDB connection error:", error);
+}
 
-  // Password validation
-  if (!passwordRegex.test(password)) {
-    return res.status(403).json({
-      message:
-        "Password must be between 6 and 20 characters and contain at least one lowercase letter, one uppercase letter, and one digit.",
-    });
-  }
+// Enhanced error handling middleware
+server.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  res.status(500).json({
+    error: "An unexpected error occurred",
+    details: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
 
+// Signin endpoint with enhanced logging
+server.post("/signin", async (req, res) => {
   try {
-    // Check if email already exists
+    console.log("Received signin request with body:", req.body);
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      console.log("Missing credentials - Email or password not provided");
+      return res.status(400).json({
+        error: "Email and password are required"
+      });
+    }
+
+    console.log("Looking up user with email:", email);
+    const user = await User.findOne({ "personal_info.email": email });
+    
+    if (!user) {
+      console.log("User not found for email:", email);
+      return res.status(404).json({ error: "Email not found" });
+    }
+
+    console.log("User found, verifying password");
+    const isPasswordValid = await bcrypt.compare(password, user.personal_info.password);
+    
+    if (!isPasswordValid) {
+      console.log("Invalid password for user:", email);
+      return res.status(403).json({ error: "Invalid password" });
+    }
+
+    console.log("Password verified, generating token");
+    const response = formatDataSend(user);
+    console.log("Sending successful response:", { ...response, access_token: '[REDACTED]' });
+    
+    return res.status(200).json(response);
+
+  } catch (err) {
+    console.error("Error in signin:", err);
+    return res.status(500).json({
+      error: "An error occurred during signin",
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
+// Signup endpoint with enhanced logging
+server.post("/signup", async (req, res) => {
+  try {
+    console.log("Received signup request:", req.body);
+    const { fullname, email, password } = req.body;
+
+    // Validate required fields
+    if (!fullname || !email || !password) {
+      console.log("Missing required fields:", { fullname: !!fullname, email: !!email, password: !!password });
+      return res.status(400).json({
+        error: "All fields are required",
+        received: { fullname: !!fullname, email: !!email, password: !!password }
+      });
+    }
+
+    // Validate fullname
+    if (fullname.length < 3 || fullname.length > 20) {
+      console.log("Invalid fullname length:", fullname.length);
+      return res.status(400).json({
+        error: "Fullname must be between 3 and 20 characters"
+      });
+    }
+
+    // Validate email
+    if (!emailRegex.test(email)) {
+      console.log("Invalid email format:", email);
+      return res.status(400).json({ error: "Invalid email format" });
+    }
+
+    // Validate password
+    if (!passwordRegex.test(password)) {
+      console.log("Invalid password format");
+      return res.status(400).json({
+        error: "Password must be 6-20 characters with at least one uppercase letter, one lowercase letter, and one number"
+      });
+    }
+
+    // Check for existing user
+    console.log("Checking for existing user with email:", email);
     const existingUser = await User.findOne({ "personal_info.email": email });
     if (existingUser) {
+      console.log("User already exists with email:", email);
       return res.status(409).json({ error: "Email already exists" });
     }
 
-    // Hash the password
-    const hashed_password = await bcrypt.hash(password, 10);
+    // Hash password
+    console.log("Hashing password");
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate unique username
-    const username = await generateUsername(email);
+    // Generate username
+    console.log("Generating unique username from email");
+    let username = email.split("@")[0];
+    let usernameExists = await User.findOne({ "personal_info.username": username });
+    let counter = 1;
+    
+    while (usernameExists) {
+      username = `${email.split("@")[0]}${counter}`;
+      usernameExists = await User.findOne({ "personal_info.username": username });
+      counter++;
+    }
 
     // Create new user
+    console.log("Creating new user with username:", username);
     const user = new User({
-      personal_info: { fullname, email, password: hashed_password, username },
+      personal_info: {
+        fullname,
+        email,
+        password: hashedPassword,
+        username
+      }
     });
 
-    // Save user to database
+    // Save user
+    console.log("Saving user to database");
     await user.save();
 
-    // Send response to client
-    return res.status(200).json(formatDataSend(user));
+    // Generate response
+    console.log("Generating auth token and sending response");
+    const response = formatDataSend(user);
+    return res.status(200).json(response);
+
   } catch (err) {
-    // Handle general errors
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-server.post("/signin", (req, res) => {
-  const { email, password } = req.body;
-
-  User.findOne({ "personal_info.email": email })
-    .then((user) => {
-      if (!user) {
-        return res.status(404).json({ error: "email not found" });
-      }
-
-      // Check if user has a Google-authenticated account
-      if (!user.google_auth) {
-        // Compare password if it's not a Google-authenticated account
-        bcrypt.compare(password, user.personal_info.password, (err, result) => {
-          if (err) {
-            return res.status(403).json({
-              error: "Error occurred during signin, please try again",
-            });
-          }
-          if (!result) {
-            return res.status(403).json({
-              error: "Invalid password",
-            });
-          } else {
-            return res.status(200).json(formatDataSend(user));
-          }
-        });
-      } else {
-        // If user has logged in with Google, return an error
-        return res.status(403).json({
-          error:
-            "This account is already linked with Google, please log in using Google",
-        });
-      }
-    })
-    .catch((err) => {
-      console.error("Signin Error: ", err); // Log the error for debugging
-      return res.status(500).json({ error: "Server error" });
+    console.error("Error in signup:", err);
+    return res.status(500).json({
+      error: "An error occurred during signup",
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
+  }
 });
 
 server.post("/google-auth", async (req, res) => {

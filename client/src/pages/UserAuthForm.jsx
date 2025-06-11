@@ -17,8 +17,13 @@ const UserAuthForm = ({ type }) => {
   } = useContext(UserContext);
 
 const userAuthThroughServer = (serverRoute, formData) => {
+  console.log("Sending data:", formData); // Debug log
   axios
-    .post(import.meta.env.VITE_SERVER_DOMAIN + serverRoute, formData)
+    .post("/api" + serverRoute, formData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
     .then(({ data }) => {
       storeInSession("user", JSON.stringify(data)); // Store user data in session
       setUserAuth(data); // Update the user authentication state
